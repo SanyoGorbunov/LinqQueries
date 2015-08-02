@@ -122,9 +122,22 @@ namespace LinqQueries
         
         static void Main(string[] args)
         {
-            var result = Report.GetReports()
-                .Select(report => new { report.StudentID, report.Mark });
-            PrintAnonymousEnumerable(result);
+            var avgMarksBySubjsFromReports = Report.GetReports()
+                .GroupBy(report => report.SubjectID)
+                .Select(group => new { SubjectID = group.Key, Avg = group.Average(report => report.Mark) });
+
+            var avgMarks = Subject.GetSubjects()
+                .GroupJoin(avgMarksBySubjsFromReports,
+                    subj => subj.ID,
+                    reportAvgMarks => reportAvgMarks.SubjectID,
+                    (subj, reportAvgMarksCol) => new
+                    {
+                        subj.Name,
+                        Avg = reportAvgMarksCol.Select(reportAvgMarks => reportAvgMarks.Avg).FirstOrDefault()
+                    });
+
+            PrintAnonymousEnumerable(avgMarks);
+            Console.ReadLine();
         }
 
         static void PrintAnonymousEnumerable<T>(IEnumerable<T> lst)
