@@ -122,50 +122,9 @@ namespace LinqQueries
         
         static void Main(string[] args)
         {
-
-            var newReport = Report.GetReports();
-            var newList = newReport.Where(n => n.Mark > 5 && IsSecondQuarter(n))
-                .OrderBy(n => n.Date)
-                .Select(n => new {n.Date,n.Mark,n.StudentID});
-
-            var t = from r in Report.GetReports()
-                    where r.Mark > 5 && IsSecondQuarter(r)
-                    orderby r.Date 
-                    select new { r.Date, r.Mark, r.StudentID };
-
-            
-            //var result = Report.GetReports()
-            //    .Join(Student.GetStudents(), (n => n.StudentID), (n => n.ID), ((a, b) => new { b.FormID, b.Name }))
-            //    .Join(Form.GetForms(), (n => n.FormID),(n=>n.ID), ((a, b) => new {a.Name,b.Number }))
-            //    .Where(n => n.Number == 7 );
-
-            //Report.GetReports().GroupBy(n => n.SubjectID, n => n.Mark);
-            //foreach (var item in res)
-            //{
-            //    PrintAnonymousEnumerable(item);
-            //}
-
-            var result = Subject.GetSubjects().GroupJoin(
-                Report.GetReports().GroupBy(n => n.SubjectID, n => n.Mark),
-                subj => subj.ID,
-                subjReps => subjReps.Key,
-                (subj, subjReps) => new { subj.Name, Avg = subjReps.Single().DefaultIfEmpty(0).Average() });
-
-            //var result = Report.GetReports()
-            //    .GroupBy(n => n.SubjectID);
-
-            List<int> lst = new List<int>();
-            foreach (var elem in lst.DefaultIfEmpty())
-            {
-                //Console.WriteLine(elem);
-            }
-
+            var result = Report.GetReports()
+                .Select(report => new { report.StudentID, report.Mark });
             PrintAnonymousEnumerable(result);
-        }
-
-        private static bool IsSecondQuarter(Report n)
-        {
-            return n.Date.Month > 3 && n.Date.Month < 7;
         }
 
         static void PrintAnonymousEnumerable<T>(IEnumerable<T> lst)
